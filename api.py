@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
 import werkzeug, os
+import subprocess as sp
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = set(['torrent'])
@@ -21,6 +22,10 @@ class HelloWorld(Resource):
 
 
 class Torrent(Resource):
+    def get(self):
+        p = sp.run(["transmission-remote", "-n", "transmission:transmission", "-l"], stdout=sp.PIPE)
+        return p.stdout.decode('utf-8')
+
 
     def post(self):
         data = parser.parse_args()
@@ -31,7 +36,6 @@ class Torrent(Resource):
                     'status':'error'
                     }
         torrent = data['file']
-
         if torrent and allowed_file(torrent.filename):
             filename = torrent.filename
             torrent.save(os.path.join(UPLOAD_FOLDER,filename))
@@ -48,7 +52,7 @@ class Torrent(Resource):
 
 
 api.add_resource(HelloWorld, '/')
-api.add_resource(Torrent,'/upload')
+api.add_resource(Torrent,'/torrents')
 
 if __name__ == '__main__':
     app.run('0.0.0.0')
