@@ -24,8 +24,8 @@ class HelloWorld(Resource):
 class Torrent(Resource):
     def get(self):
         p = sp.run(["transmission-remote", "-n", "transmission:transmission", "-l"], stdout=sp.PIPE)
+	#TODO Interprétation du résultat
         return p.stdout.decode('utf-8')
-
 
     def post(self):
         data = parser.parse_args()
